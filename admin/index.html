@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#120c22">
+<title>Painel | Axon 3D</title>
+<style>
+:root{--bg:#120c22;--bg2:#181030;--surface:#1f1638;--surface2:#2a1f4a;--line:rgba(255,255,255,.12);--text:#f4f0ff;--muted:#b9afd6;--cyan:#2ef2ff;--magenta:#ff3dd8;--violet:#8a5cff;--danger:#ff6b81;--ok:#4be3a0}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{font:400 1rem/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--text);background:radial-gradient(900px 500px at 90% -10%,rgba(138,92,255,.28),transparent 60%),var(--bg);min-height:100vh}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+img,video{max-width:100%;display:block}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:2px;border-radius:8px}
+h1,h2,h3{font-weight:700;line-height:1.2}
+small{color:var(--muted);font-size:.85rem;display:block;margin-top:.3rem}
+
+/* botões */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.7rem 1.1rem;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);cursor:pointer;font-weight:600;transition:all .15s;text-decoration:none;color:var(--text)}
+.btn:hover{border-color:var(--cyan);box-shadow:0 0 16px rgba(46,242,255,.25)}
+.btn.primary{background:linear-gradient(120deg,var(--cyan),var(--magenta));color:#160a26;border-color:transparent}
+.btn.primary:hover{box-shadow:0 0 22px rgba(255,61,216,.5)}
+.btn.ghost{background:transparent}
+.btn.danger{color:var(--danger);border-color:rgba(255,107,129,.4);background:transparent}
+.btn.danger:hover{border-color:var(--danger);box-shadow:0 0 14px rgba(255,107,129,.3)}
+.btn.sm{padding:.45rem .8rem;min-height:38px;font-size:.9rem;border-radius:10px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* login */
+.login{min-height:100vh;display:grid;place-items:center;padding:1.2rem}
+.login form{width:min(400px,100%);background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:1.8rem;display:grid;gap:1rem;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.login h1{font-size:1.5rem}
+.login p{color:var(--muted)}
+.err{color:var(--danger);font-size:.95rem;min-height:1.3em}
+
+/* estrutura */
+.top{position:sticky;top:0;z-index:40;background:rgba(18,12,34,.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.top-in{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;max-width:1200px;margin:0 auto;flex-wrap:wrap}
+.top-in .brand{font-weight:700;font-size:1.1rem;margin-right:auto}
+.top-in .brand span{color:var(--cyan)}
+.status{font-size:.88rem;color:var(--muted);display:flex;align-items:center;gap:.4rem}
+.status i{width:9px;height:9px;border-radius:50%;background:var(--ok);display:inline-block}
+.status.dirty{color:#ffd166}.status.dirty i{background:#ffd166;box-shadow:0 0 8px #ffd166}
+.layout{display:grid;grid-template-columns:230px 1fr;gap:1.5rem;max-width:1200px;margin:0 auto;padding:1.2rem 1rem 6rem}
+.tabs{display:flex;flex-direction:column;gap:.3rem;position:sticky;top:78px;align-self:start}
+.tabs button{text-align:left;padding:.7rem .9rem;border-radius:12px;border:1px solid transparent;background:transparent;cursor:pointer;color:var(--muted);font-weight:600;min-height:44px}
+.tabs button:hover{background:rgba(255,255,255,.05);color:var(--text)}
+.tabs button[aria-current=page]{background:var(--surface2);color:var(--text);border-color:rgba(46,242,255,.5)}
+@media(max-width:820px){
+  .layout{grid-template-columns:1fr;gap:1rem}
+  .tabs{flex-direction:row;overflow-x:auto;position:static;padding-bottom:.4rem;scrollbar-width:none;margin:0 -1rem;padding:0 1rem .4rem}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{white-space:nowrap;border-color:var(--line)}
+}
+main h2{font-size:1.6rem;margin-bottom:.3rem}
+.lead{color:var(--muted);margin-bottom:1.2rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.2rem;margin-bottom:1.1rem;display:grid;gap:1rem}
+.card>h3{font-size:1.05rem}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:640px){.row2{grid-template-columns:1fr}}
+
+/* campos */
+.f{display:grid;gap:.35rem}
+.f>span{font-weight:600;font-size:.92rem}
+.f input[type=text],.f input[type=url],.f textarea,.f select,.sl-row input{width:100%;padding:.7rem .8rem;border-radius:11px;border:1px solid var(--line);background:var(--bg2);min-height:44px}
+.f textarea{resize:vertical;line-height:1.45}
+.f input:focus,.f textarea:focus,.f select:focus,.sl-row input:focus{border-color:var(--cyan);outline:none;box-shadow:0 0 0 3px rgba(46,242,255,.2)}
+.chk{display:flex;align-items:center;gap:.7rem;cursor:pointer;min-height:44px}
+.chk input{width:22px;height:22px;accent-color:var(--magenta)}
+.colors{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem}
+.colorf{display:flex;align-items:center;gap:.7rem}
+.colorf input[type=color]{width:56px;height:56px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);padding:4px;cursor:pointer}
+.swatch{display:flex;gap:.6rem;flex-wrap:wrap}
+.pv{border-radius:16px;padding:1.2rem;border:1px solid var(--line);display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}
+.pv b{padding:.6rem 1.1rem;border-radius:12px;color:#160a26}
+
+/* imagem */
+.imgf-row{display:flex;gap:.9rem;align-items:flex-start}
+.thumb{width:96px;height:96px;flex:none;border-radius:14px;overflow:hidden;background:var(--bg2);border:1px dashed var(--line);display:grid;place-items:center;color:var(--muted);font-size:.8rem}
+.thumb img,.thumb video{width:100%;height:100%;object-fit:cover}
+.imgf-side{flex:1;display:grid;gap:.5rem;min-width:0}
+.btns{display:flex;gap:.5rem;flex-wrap:wrap}
+.imgs{display:flex;flex-wrap:wrap;gap:.7rem}
+.im{position:relative;width:104px}
+.im img{width:104px;height:104px;object-fit:cover;border-radius:12px;border:1px solid var(--line)}
+.im .badge{position:absolute;top:6px;left:6px;background:var(--magenta);color:#160a26;font-size:.7rem;font-weight:700;padding:.1rem .5rem;border-radius:999px}
+.im-b{display:flex;justify-content:space-between;gap:.2rem;margin-top:.3rem}
+.im-b button{flex:1;min-height:34px;border-radius:8px;border:1px solid var(--line);background:var(--bg2);cursor:pointer}
+.im-b button:hover{border-color:var(--cyan)}
+.addbox{width:104px;height:104px;border-radius:12px;border:2px dashed var(--line);background:transparent;cursor:pointer;color:var(--muted);display:grid;place-items:center;text-align:center;font-size:.85rem;padding:.4rem}
+.addbox:hover{border-color:var(--cyan);color:var(--text)}
+
+/* listas */
+.sl-row{display:flex;gap:.5rem;margin-bottom:.5rem}
+.sl-row input{flex:1}
+details.item{border:1px solid var(--line);border-radius:16px;background:var(--bg2);overflow:hidden}
+details.item[open]{border-color:rgba(46,242,255,.45)}
+details.item>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:.8rem;padding:.7rem .9rem;min-height:56px}
+details.item>summary::-webkit-details-marker{display:none}
+details.item>summary::after{content:"+";margin-left:auto;font-size:1.5rem;color:var(--cyan);flex:none}
+details.item[open]>summary::after{content:"–"}
+.sum-th{width:42px;height:42px;border-radius:10px;overflow:hidden;background:var(--surface2);flex:none;display:grid;place-items:center;font-size:.75rem;color:var(--muted)}
+.sum-th img{width:100%;height:100%;object-fit:cover}
+.sum-t{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sum-s{font-size:.82rem;color:var(--muted)}
+.pill{font-size:.72rem;padding:.1rem .55rem;border-radius:999px;background:rgba(255,200,87,.15);color:#ffc857;border:1px solid rgba(255,200,87,.4);flex:none}
+.item-body{padding:.4rem .9rem 1rem;display:grid;gap:1rem;border-top:1px solid var(--line)}
+.item-actions{display:flex;gap:.5rem;flex-wrap:wrap;justify-content:flex-end;border-top:1px solid var(--line);padding-top:.9rem}
+.toolbar{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1rem}
+pre.code{background:#0b0716;border:1px solid var(--line);border-radius:12px;padding:.9rem;overflow-x:auto;font-size:.82rem;color:#c8f7ff;white-space:pre-wrap;word-break:break-all}
+details.help{border:1px solid var(--line);border-radius:12px;padding:.2rem .9rem;background:var(--bg2)}
+details.help summary{cursor:pointer;padding:.6rem 0;font-weight:600}
+details.help>*:not(summary){margin-bottom:.7rem}
+
+/* biblioteca */
+.lib{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.8rem}
+.tile{background:var(--bg2);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:grid;text-align:left}
+.tile-m{aspect-ratio:1;background:#0b0716;display:grid;place-items:center;overflow:hidden;border:0;padding:0;cursor:default;width:100%}
+.tile-m img,.tile-m video{width:100%;height:100%;object-fit:cover}
+.pickable .tile-m{cursor:pointer}
+.tile-i{padding:.5rem .6rem;display:grid;gap:.4rem}
+.tile-n{font-size:.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tile-s{font-size:.75rem;color:var(--muted)}
+.tile-b{display:flex;gap:.3rem}
+.tile-b .btn{flex:1;padding:.3rem;min-height:34px;font-size:.8rem}
+
+/* modal biblioteca */
+.modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:1rem;background:rgba(8,4,18,.8)}
+.modal-card{width:min(860px,100%);max-height:calc(100dvh - 2rem);overflow:auto;background:var(--bg2);border:1px solid rgba(46,242,255,.35);border-radius:22px;padding:1.2rem;display:grid;gap:1rem}
+.modal-head{display:flex;align-items:center;gap:.7rem}
+.modal-head h3{margin-right:auto}
+
+/* barra fixa, toast, ocupado */
+.busy{position:fixed;inset:0;z-index:100;background:rgba(8,4,18,.7);display:grid;place-items:center;color:#fff;font-weight:600}
+.busy div{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:1.2rem 1.6rem;display:flex;gap:.8rem;align-items:center}
+.spin{width:22px;height:22px;border-radius:50%;border:3px solid rgba(255,255,255,.2);border-top-color:var(--cyan);animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:120;background:var(--surface2);border:1px solid var(--ok);color:var(--text);padding:.8rem 1.2rem;border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.5);max-width:calc(100% - 2rem);font-weight:600}
+.toast.bad{border-color:var(--danger)}
+</style>
+</head>
+<body>
+
+<section class="login" id="login">
+  <form id="loginForm">
+    <h1>Painel da Axon 3D</h1>
+    <p>Entre com a senha de administrador para editar o site.</p>
+    <label class="f"><span>Senha</span><input type="password" id="pass" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false" required style="padding:.7rem .8rem;border-radius:11px;border:1px solid var(--line);background:var(--bg2);min-height:44px"></label>
+    <label class="chk"><input type="checkbox" id="showPass"><span>Mostrar senha</span></label>
+    <div class="err" id="loginErr" role="alert"></div>
+    <button class="btn primary" type="submit">Entrar</button>
+    <p style="font-size:.85rem;color:var(--muted)">Problemas para entrar? <a href="../api.php?r=health" target="_blank" rel="noopener" style="color:var(--cyan)">Testar a conexão com o servidor</a></p>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-in">
+      <div class="brand">Axon <span>3D</span> · Painel</div>
+      <div class="status" id="status"><i></i><span>Tudo publicado</span></div>
+      <button class="btn ghost sm" id="previewBtn" type="button">Ver prévia</button>
+      <button class="btn primary sm" id="publishBtn" type="button">Publicar</button>
+      <button class="btn ghost sm" id="logoutBtn" type="button">Sair</button>
+    </div>
+  </header>
+  <div class="layout">
+    <nav class="tabs" id="tabs" aria-label="Seções do painel"></nav>
+    <main id="panel"></main>
+  </div>
+</div>
+
+<div class="modal" id="libModal" role="dialog" aria-modal="true" aria-labelledby="libTitle" hidden>
+  <div class="modal-card">
+    <div class="modal-head"><h3 id="libTitle">Biblioteca de mídia</h3>
+      <button class="btn sm" id="libUpload" type="button">Enviar novo arquivo</button>
+      <button class="btn ghost sm" id="libClose" type="button">Fechar</button></div>
+    <div id="libBody" class="pickable"></div>
+  </div>
+</div>
+
+<input type="file" id="fileIn" hidden>
+<div class="busy" id="busy" hidden><div><span class="spin"></span><span id="busyMsg">Aguarde…</span></div></div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script type="application/json" id="default-content">{"version": 1, "brand": {"logo": "", "favicon": ""}, "site": {"whatsapp": "5500000000000", "message": "Olá! Vi o site da Axon 3D e quero fazer um orçamento para um Funko personalizado.", "instagram": "", "tiktok": "", "youtube": "", "seoTitle": "Axon 3D | Funko personalizado a partir da sua foto", "seoDescription": "Transforme sua foto em um Funko Pop exclusivo em 3D. Modelagem 3D aprovada por você, impressão e pintura à mão. Peça seu orçamento pelo WhatsApp."}, "menu": {"steps": "Como funciona", "gallery": "Galeria", "testimonials": "Avaliações", "faq": "FAQ", "cta": "WhatsApp", "fab": "Pedir orçamento"}, "theme": {"cyan": "#2ef2ff", "magenta": "#ff3dd8", "violet": "#8a5cff", "bg": "#120c22"}, "sections": {"steps": true, "gallery": true, "testimonials": true, "faq": true, "cta": true}, "hero": {"title": "Transforme sua foto em um Funko Pop exclusivo em 3D", "subtitle": "Você envia a foto. A gente modela, imprime em 3D e pinta à mão. Antes de imprimir, você aprova o modelo.", "primary": "Pedir orçamento no WhatsApp", "secondary": "Ver como funciona", "proof": ["Modelagem 3D aprovada por você", "Pintura feita à mão", "Peça única, feita da sua foto"], "mode": "animation", "videoUrl": "", "posterUrl": "", "videoRatio": "4/5"}, "steps": {"title": "Da foto à estante em 4 passos", "items": [{"title": "Envie sua foto", "text": "Mande uma foto nítida pelo WhatsApp. Se quiser, conte detalhes como roupa e acessórios."}, {"title": "Aprovamos a modelagem 3D", "text": "Criamos o seu Funko em 3D e mostramos o resultado. Você pede os ajustes que quiser."}, {"title": "Imprimimos e pintamos à mão", "text": "A peça é impressa camada por camada e ganha pintura e acabamento feitos à mão."}, {"title": "Receba na sua casa", "text": "Embalamos com cuidado e enviamos para o seu endereço."}]}, "gallery": {"title": "Funkos que já saíram da impressora", "subtitle": "Escolha uma categoria e toque em um projeto para ver os detalhes.", "moreLabel": "Ver mais projetos", "categories": ["Casais", "Geeks", "Pets", "Profissões"], "items": [{"id": "w1", "title": "Casal de namorados", "cat": "Casais", "tone": "#ff3dd8", "heart": true, "desc": "Um par de Funkos lado a lado, com as roupas do dia do primeiro encontro.", "base": "Uma foto do casal juntos", "detail": "Moletom, cabelo longo e cores escolhidas pelo casal", "figs": [{"t": "f", "x": 122, "s": 0.7, "o": {"hair": "#2b1b16", "shirt": "#2ef2ff", "outfit": "hoodie"}}, {"t": "f", "x": 278, "s": 0.7, "o": {"skin": "#e8b48c", "hair": "#5a2a1a", "hairStyle": "long", "shirt": "#ff3dd8", "pants": "#1f1a33"}}], "images": [], "visible": true}, {"id": "w2", "title": "Casamento", "cat": "Casais", "tone": "#ff9ae9", "heart": true, "desc": "Noivos para o topo do bolo ou para a estante de casa nova.", "base": "Foto de noivado e referência da roupa", "detail": "Terno com gravata borboleta, vestido branco e buquê", "figs": [{"t": "f", "x": 126, "s": 0.7, "o": {"hair": "#231812", "outfit": "suit", "pants": "#1f1a33"}}, {"t": "f", "x": 274, "s": 0.7, "o": {"skin": "#f1bf98", "hair": "#7a4a2a", "hairStyle": "bun", "outfit": "dress", "shirt": "#ff3dd8", "prop": "bouquet"}}], "images": [], "visible": true}, {"id": "w3", "title": "Gamer de headset", "cat": "Geeks", "tone": "#2ef2ff", "desc": "O jogador de sempre, com headset e controle, pronto para o setup.", "base": "Foto do rosto e do setup", "detail": "Headset, óculos, moletom roxo e controle", "figs": [{"t": "f", "x": 200, "s": 0.84, "o": {"hair": "#1d1530", "shirt": "#8a5cff", "outfit": "hoodie", "headset": true, "glasses": true, "prop": "pad"}}], "images": [], "visible": true}, {"id": "w4", "title": "Dev de moletom", "cat": "Geeks", "tone": "#8a5cff", "desc": "Programador com laptop na mão e o moletom favorito.", "base": "Foto do rosto e do estilo do dia a dia", "detail": "Óculos, moletom grafite e laptop com código na tela", "figs": [{"t": "f", "x": 200, "s": 0.84, "o": {"skin": "#d9a07a", "hair": "#241812", "shirt": "#3b3560", "outfit": "hoodie", "glasses": true, "prop": "laptop", "pants": "#161226"}}], "images": [], "visible": true}, {"id": "w5", "title": "Thor, o golden", "cat": "Pets", "tone": "#ffc857", "desc": "O melhor amigo em versão colecionável, com coleira e tudo.", "base": "Fotos do cachorro de frente e de lado", "detail": "Pelagem dourada, orelhas caídas e coleira magenta", "figs": [{"t": "p", "x": 200, "s": 0.9, "o": {"kind": "dog"}}], "images": [], "visible": true}, {"id": "w6", "title": "Mia, a gata", "cat": "Pets", "tone": "#8a5cff", "desc": "A gata da casa com as listras no lugar certo.", "base": "Fotos da gata de frente", "detail": "Pelo cinza rajado, orelhas rosa e coleira ciano", "figs": [{"t": "p", "x": 200, "s": 0.9, "o": {"kind": "cat", "coat": "#9a96b4", "collar": "#2ef2ff", "stripes": true}}], "images": [], "visible": true}, {"id": "w7", "title": "Chef de cozinha", "cat": "Profissões", "tone": "#ffc857", "desc": "Para presentear quem manda na cozinha.", "base": "Foto do rosto e do uniforme", "detail": "Chapéu de chef, dólmã branco e lenço magenta", "figs": [{"t": "f", "x": 200, "s": 0.78, "o": {"skin": "#e8b48c", "hairStyle": "none", "outfit": "chef", "hat": "chef", "pants": "#2a2350"}}], "images": [], "visible": true}, {"id": "w8", "title": "Doutora", "cat": "Profissões", "tone": "#2ef2ff", "desc": "Presente de formatura com jaleco e estetoscópio.", "base": "Foto do rosto e do jaleco", "detail": "Jaleco branco, estetoscópio e cabelo preso", "figs": [{"t": "f", "x": 200, "s": 0.84, "o": {"skin": "#c98e6a", "hair": "#1d1530", "hairStyle": "bun", "outfit": "coat", "pants": "#3cc9d8"}}], "images": [], "visible": true}, {"id": "w9", "title": "Engenheiro de obra", "cat": "Profissões", "tone": "#ffc857", "desc": "Capacete amarelo e óculos para a mesa do escritório.", "base": "Foto do rosto e do equipamento", "detail": "Capacete amarelo, camisa laranja e óculos", "figs": [{"t": "f", "x": 200, "s": 0.78, "o": {"hairStyle": "none", "shirt": "#ff8a3d", "hat": "helmet", "glasses": true, "pants": "#22304f"}}], "images": [], "visible": true}]}, "testimonials": {"title": "Foto de um lado, Funko do outro", "subtitle": "Veja a foto enviada e o Funko que chegou na casa de quem já pediu.", "labelOriginal": "Foto enviada", "labelResult": "Funko pronto", "items": [{"id": "t1", "kind": "pair", "name": "Camila e Rafael", "city": "Belo Horizonte, MG", "text": "Mandamos uma foto do nosso primeiro rolê. O Funko veio com a jaqueta do Rafa e o meu cabelo do jeito certo. Virou o enfeite mais elogiado da sala.", "original": "", "holding": "", "visible": true, "art": {"tone": "#ff3dd8", "figs": [{"t": "f", "x": 122, "s": 0.7, "o": {"hair": "#2b1b16", "shirt": "#2ef2ff", "outfit": "hoodie"}}, {"t": "f", "x": 278, "s": 0.7, "o": {"skin": "#e8b48c", "hair": "#5a2a1a", "hairStyle": "long", "shirt": "#ff3dd8", "pants": "#1f1a33"}}], "heart": true}}, {"id": "t2", "kind": "person", "name": "Diego M.", "city": "Curitiba, PR", "text": "Pedi um Funko meu de headset para a mesa do setup. Aprovei a modelagem antes de imprimir e o resultado ficou igualzinho.", "original": "", "holding": "", "visible": true, "art": {"tone": "#2ef2ff", "figs": [{"t": "f", "x": 200, "s": 0.84, "o": {"hair": "#1d1530", "shirt": "#8a5cff", "outfit": "hoodie", "headset": true, "glasses": true, "prop": "pad"}}], "heart": false}}, {"id": "t3", "kind": "pet", "name": "Fernanda L.", "city": "Goiânia, GO", "text": "A Mia ganhou versão Funko com as listras no lugar. Fiquei emocionada quando abri a caixa.", "original": "", "holding": "", "visible": true, "art": {"tone": "#8a5cff", "figs": [{"t": "p", "x": 200, "s": 0.9, "o": {"kind": "cat", "coat": "#9a96b4", "collar": "#2ef2ff", "stripes": true}}], "heart": false}}, {"id": "t4", "kind": "person", "name": "Marcos A.", "city": "Recife, PE", "text": "Encomendei um de chef para mim. A pintura à mão faz toda a diferença no acabamento.", "original": "", "holding": "", "visible": true, "art": {"tone": "#ffc857", "figs": [{"t": "f", "x": 200, "s": 0.78, "o": {"skin": "#e8b48c", "hairStyle": "none", "outfit": "chef", "hat": "chef", "pants": "#2a2350"}}], "heart": false}}, {"id": "t5", "kind": "person", "name": "Paula S.", "city": "Porto Alegre, RS", "text": "Presente de formatura para minha irmã. Ela reconheceu o jaleco e o estetoscópio na hora.", "original": "", "holding": "", "visible": true, "art": {"tone": "#2ef2ff", "figs": [{"t": "f", "x": 200, "s": 0.84, "o": {"skin": "#c98e6a", "hair": "#1d1530", "hairStyle": "bun", "outfit": "coat", "pants": "#3cc9d8"}}], "heart": false}}]}, "faq": {"title": "Perguntas frequentes", "items": [{"q": "Que tipo de foto devo enviar?", "a": "Uma foto nítida, de frente e com boa luz, mostrando o rosto e a roupa que você quer no Funko. Pode mandar mais de uma para detalhes como cabelo, tatuagens ou acessórios."}, {"q": "Posso ver o modelo antes de imprimir?", "a": "Sim. Depois de criar o modelo 3D, enviamos imagens para você aprovar ou pedir ajustes. A impressão só começa depois da sua aprovação."}, {"q": "Quanto tempo leva para ficar pronto?", "a": "O prazo depende do tamanho e da quantidade de peças. A previsão vem junto com o orçamento, pelo WhatsApp."}, {"q": "Quanto custa?", "a": "O valor varia com o tamanho, o número de personagens e os acessórios. Envie sua foto no WhatsApp e receba o orçamento."}, {"q": "Dá para fazer casais, pets e profissões?", "a": "Dá. Fazemos casais, pets, profissões, gamers, times e presentes com vários personagens. Conte sua ideia no WhatsApp."}, {"q": "Como é feita a entrega?", "a": "Embalamos a peça com proteção e enviamos para o seu endereço. O frete é calculado no orçamento."}, {"q": "O Funko é um produto oficial da marca Funko?", "a": "Não. É uma peça exclusiva da Axon 3D, feita a partir da sua foto e inspirada nesse estilo. Não é um produto oficial da Funko."}]}, "cta": {"title": "Quer o seu Funko personalizado? Fale com a gente no WhatsApp", "text": "Envie sua foto e conte o que você imagina. A gente responde com o orçamento.", "button": "Chamar no WhatsApp"}, "footer": {"tagline": "Ideias em realidade. Funkos personalizados a partir da sua foto.", "copyright": "Axon 3D. Todos os direitos reservados.", "disclaimer": "Funko e Funko Pop! são marcas registradas de seus respectivos titulares. A Axon 3D é uma marca independente e não tem vínculo com a Funko. As peças são criações personalizadas feitas sob encomenda.", "terms": "Os pedidos são feitos pelo WhatsApp. O valor, o prazo e o frete são combinados no orçamento.\n\nAntes de imprimir, enviamos a modelagem 3D para a sua aprovação. Ajustes depois da aprovação podem ser cobrados à parte.\n\nCada peça é feita sob encomenda e pintada à mão, por isso pode haver pequenas variações de tom em relação às imagens de referência.", "privacy": "As fotos que você envia são usadas apenas para criar o seu Funko.\n\nNão publicamos a sua foto nem a sua peça sem a sua autorização.\n\nVocê pode pedir a exclusão dos seus arquivos a qualquer momento pelo WhatsApp."}}</script>
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const DEFAULTS = JSON.parse($("#default-content").textContent);
+const API = new URL("../api.php?r=", document.baseURI).href;
+const TOKEN_KEY = "axon3d:token", DRAFT_KEY = "axon3d:draft";
+let MAX_MB = 5, MAX_BYTES = MAX_MB * 1024 * 1024;
+
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+const uid = () => Math.random().toString(36).slice(2, 9);
+const mb = n => (n / 1024 / 1024).toFixed(1).replace(".", ",") + " MB";
+const getp = (o, p) => p.split(".").reduce((a, k) => (a == null ? a : a[k]), o);
+function setp(o, p, v) { const k = p.split("."), last = k.pop(); const t = k.reduce((a, x) => a[x], o); t[last] = v; }
+function merge(a, b) {
+  if (b == null) return a;
+  if (Array.isArray(b)) return b;
+  if (typeof b === "object" && a && typeof a === "object" && !Array.isArray(a)) { const o = Object.assign({}, a); for (const k in b) o[k] = merge(a[k], b[k]); return o; }
+  return b;
+}
+const clone = o => JSON.parse(JSON.stringify(o));
+
+let data = null, dirty = false, activeTab = "geral", draftTimer = null;
+const openSet = new Set();
+let pendingOpen = null;
+
+/* ---------- API ---------- */
+const NO_API = "O painel não encontrou a API do site. Confira se o arquivo api.php está na mesma pasta do site e se a hospedagem tem PHP 7.4 ou superior. Use o link 'Testar a conexão' na tela de login para ver o diagnóstico.";
+const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+const lsSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) { /* ignora */ } };
+function token() { try { const t = JSON.parse(lsGet(TOKEN_KEY) || "null"); return t && t.exp > Date.now() ? t.token : null; } catch (e) { return null; } }
+async function api(path, opts = {}) {
+  const headers = Object.assign({}, opts.headers || {});
+  const t = token(); if (t) headers["x-axon-token"] = t;
+  let r;
+  try { r = await fetch(path, Object.assign({}, opts, { headers })); }
+  catch (e) { throw new Error(location.protocol === "file:" ? "Abra o painel pelo endereço do site na hospedagem, não pelo arquivo salvo no aparelho." : "Não foi possível conectar ao servidor. Verifique a internet e tente de novo."); }
+  let j = null; if ((r.headers.get("content-type") || "").includes("json")) j = await r.json().catch(() => null);
+  if (r.status === 401 && path !== API + "login") { logout(); throw new Error("Sessão expirada. Entre novamente."); }
+  if (!r.ok || j === null) {
+    if (j && j.error) throw new Error(j.error);
+    if ([404, 405, 501].includes(r.status) || r.ok) throw new Error(NO_API);
+    throw new Error("O servidor respondeu com erro " + r.status + ". Use o link 'Testar a conexão' na tela de login para ver o diagnóstico.");
+  }
+  return j;
+}
+
+/* ---------- UI utilitária ---------- */
+let toastT = null;
+function toast(msg, bad) { const t = $("#toast"); t.textContent = msg; t.className = "toast" + (bad ? " bad" : ""); t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, bad ? 6000 : 3500); }
+function busy(on, msg) { $("#busy").hidden = !on; if (msg) $("#busyMsg").textContent = msg; }
+function updateStatus() { const s = $("#status"); s.classList.toggle("dirty", dirty); $("span", s).textContent = dirty ? "Alterações não publicadas" : "Tudo publicado"; }
+function markDirty() { dirty = true; updateStatus(); clearTimeout(draftTimer); draftTimer = setTimeout(() => lsSet(DRAFT_KEY, JSON.stringify(data)), 300); }
+addEventListener("beforeunload", e => { if (dirty) { e.preventDefault(); e.returnValue = ""; } });
+
+/* ---------- Login ---------- */
+$("#showPass").addEventListener("change", e => { $("#pass").type = e.target.checked ? "text" : "password"; });
+$("#loginForm").addEventListener("submit", async e => {
+  e.preventDefault(); $("#loginErr").textContent = "";
+  busy(true, "Entrando…");
+  try {
+    const j = await api(API + "login", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ password: $("#pass").value.trim() }) });
+    lsSet(TOKEN_KEY, JSON.stringify({ token: j.token, exp: j.exp }));
+    $("#pass").value = "";
+    await start();
+  } catch (err) { $("#loginErr").textContent = err.message; } finally { busy(false); }
+});
+function logout() { lsSet(TOKEN_KEY, null); $("#app").hidden = true; $("#login").hidden = false; }
+$("#logoutBtn").addEventListener("click", () => { if (!dirty || confirm("Há alterações não publicadas. Sair mesmo assim?")) { dirty = false; logout(); } });
+
+/* ---------- Início ---------- */
+async function start() {
+  try { const h = await (await fetch(API + "health", { cache: "no-store" })).json(); if (h && h.maxUploadMB > 0) { MAX_MB = h.maxUploadMB; MAX_BYTES = MAX_MB * 1024 * 1024; } } catch (e) { /* mantém o padrão */ }
+  const r = await fetch(API + "content", { cache: "no-store" });
+  const saved = r.ok ? await r.json() : {};
+  data = merge(clone(DEFAULTS), saved);
+  ["gallery", "testimonials"].forEach(k => (data[k].items || []).forEach(it => { if (!it.id) it.id = uid(); }));
+  dirty = false;
+  const draft = lsGet(DRAFT_KEY);
+  if (draft && draft !== JSON.stringify(data)) {
+    if (confirm("Encontramos alterações não publicadas neste navegador. Deseja recuperá-las?")) { try { data = merge(clone(DEFAULTS), JSON.parse(draft)); dirty = true; } catch (e) { lsSet(DRAFT_KEY, null); } }
+    else lsSet(DRAFT_KEY, null);
+  }
+  $("#login").hidden = true; $("#app").hidden = false;
+  updateStatus(); renderTabs(); renderPanel();
+}
+
+/* ---------- Abas ---------- */
+const TABS = [["geral", "Geral"], ["aparencia", "Aparência"], ["inicio", "Início"], ["passos", "Como funciona"], ["galeria", "Galeria"], ["depoimentos", "Depoimentos"], ["faq", "FAQ"], ["rodape", "Chamada final e rodapé"], ["midia", "Biblioteca de mídia"], ["sistema", "Backup e sistema"]];
+function renderTabs() { $("#tabs").innerHTML = TABS.map(([k, n]) => `<button type="button" data-tab="${k}" ${k === activeTab ? 'aria-current="page"' : ""}>${n}</button>`).join(""); }
+$("#tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (!b) return; activeTab = b.dataset.tab; renderTabs(); renderPanel(); scrollTo(0, 0); });
+
+/* ---------- Componentes de campo ---------- */
+const H = (t, d) => `<h2>${t}</h2><p class="lead">${d || ""}</p>`;
+const card = (t, body) => `<section class="card">${t ? `<h3>${t}</h3>` : ""}${body}</section>`;
+const help = h => (h ? `<small>${h}</small>` : "");
+const F = {
+  text: (p, l, o = {}) => `<label class="f"><span>${l}</span><input type="text" data-bind="${p}" ${o.sum ? 'data-sum="1"' : ""} value="${esc(getp(data, p))}" placeholder="${esc(o.ph || "")}" ${o.inputmode ? `inputmode="${o.inputmode}"` : ""}>${help(o.help)}</label>`,
+  area: (p, l, o = {}) => `<label class="f"><span>${l}</span><textarea data-bind="${p}" rows="${o.rows || 3}">${esc(getp(data, p))}</textarea>${help(o.help)}</label>`,
+  check: (p, l) => `<label class="chk"><input type="checkbox" data-bind="${p}" ${getp(data, p) !== false ? "checked" : ""}><span>${l}</span></label>`,
+  select: (p, l, opts, o = {}) => `<label class="f"><span>${l}</span><select data-bind="${p}">${opts.map(([v, n]) => `<option value="${esc(v)}" ${String(getp(data, p)) === String(v) ? "selected" : ""}>${esc(n)}</option>`).join("")}</select>${help(o.help)}</label>`,
+  color: (p, l) => `<label class="colorf"><input type="color" data-bind="${p}" value="${esc(getp(data, p))}"><span class="f"><span>${l}</span><small data-hex>${esc(getp(data, p))}</small></span></label>`,
+  image: (p, l, o = {}) => {
+    const v = getp(data, p) || "", vid = o.kind === "video", kind = vid ? "video" : "image";
+    const th = v ? (vid ? `<video src="${esc(v)}" muted preload="metadata"></video>` : `<img src="${esc(v)}" alt="">`) : "vazio";
+    return `<div class="f imgf"><span>${l}</span><div class="imgf-row"><div class="thumb">${th}</div><div class="imgf-side"><div class="btns">` +
+      `<button class="btn sm" type="button" data-act="upload" data-path="${p}" data-kind="${kind}">Enviar arquivo</button>` +
+      `<button class="btn sm ghost" type="button" data-act="library" data-path="${p}" data-kind="${kind}">Biblioteca</button>` +
+      (v ? `<button class="btn sm danger" type="button" data-act="clear" data-path="${p}">Remover</button>` : "") +
+      `</div><input type="text" data-bind="${p}" data-reload="1" value="${esc(v)}" placeholder="ou cole um link (https://...)"></div></div>${help(o.help)}</div>`;
+  }
+};
+function strlist(p, label, o = {}) {
+  const a = getp(data, p) || [];
+  return `<div class="f"><span>${label}</span>` + a.map((v, i) => `<div class="sl-row"><input type="text" data-bind="${p}.${i}" ${o.cat ? `data-old="${esc(v)}" data-cat="1"` : ""} value="${esc(v)}"><button class="btn sm danger" type="button" data-act="del" data-path="${p}" data-i="${i}" aria-label="Remover">✕</button></div>`).join("") +
+    `<div><button class="btn sm" type="button" data-act="add-str" data-path="${p}">＋ ${o.add || "Adicionar"}</button></div>${help(o.help)}</div>`;
+}
+function itemTools(path, i, n, o = {}) {
+  return `<div class="item-actions">` +
+    `<button class="btn sm ghost" type="button" data-act="up" data-path="${path}" data-i="${i}" ${i === 0 ? "disabled" : ""}>↑ Subir</button>` +
+    `<button class="btn sm ghost" type="button" data-act="down" data-path="${path}" data-i="${i}" ${i === n - 1 ? "disabled" : ""}>↓ Descer</button>` +
+    `<button class="btn sm danger" type="button" data-act="del" data-path="${path}" data-i="${i}" ${o.noDel ? "disabled" : ""}>Excluir</button></div>`;
+}
+function imgsManager(p) {
+  const a = getp(data, p) || [];
+  return `<div class="f"><span>Fotos do projeto</span><div class="imgs">` +
+    a.map((u, i) => `<div class="im"><img src="${esc(u)}" alt="">${i === 0 ? '<span class="badge">Capa</span>' : ""}<div class="im-b">` +
+      `<button type="button" data-act="img-left" data-path="${p}" data-i="${i}" aria-label="Mover para a esquerda" ${i === 0 ? "disabled" : ""}>←</button>` +
+      `<button type="button" data-act="img-right" data-path="${p}" data-i="${i}" aria-label="Mover para a direita" ${i === a.length - 1 ? "disabled" : ""}>→</button>` +
+      `<button type="button" data-act="img-del" data-path="${p}" data-i="${i}" aria-label="Remover foto">✕</button></div></div>`).join("") +
+    `<button class="addbox" type="button" data-act="imgs-upload" data-path="${p}">＋ Enviar fotos</button>` +
+    `<button class="addbox" type="button" data-act="imgs-library" data-path="${p}">Da biblioteca</button></div>` +
+    `<small>A primeira foto é a capa do card. Toque em ← → para mudar a ordem.</small></div>`;
+}
+function thumbOf(u) { return u ? `<img src="${esc(u)}" alt="">` : ""; }
+
+/* ---------- Telas ---------- */
+const views = {};
+
+views.geral = () => H("Geral", "Contato, logo, menu e seções que aparecem no site.") +
+  card("WhatsApp", F.text("site.whatsapp", "Número do WhatsApp Business", { ph: "5511999999999", inputmode: "numeric", help: "Só números, com país (55) e DDD. Todos os botões do site usam este número." }) +
+    F.area("site.message", "Mensagem pré-preenchida", { rows: 3, help: "Aparece pronta no WhatsApp do cliente quando ele clica em um botão." })) +
+  card("Redes sociais", `<div class="row2">${F.text("site.instagram", "Instagram", { ph: "https://instagram.com/seuperfil" })}${F.text("site.tiktok", "TikTok", { ph: "https://tiktok.com/@seuperfil" })}</div>${F.text("site.youtube", "YouTube", { ph: "https://youtube.com/@seucanal", help: "Deixe em branco para esconder o ícone." })}`) +
+  card("Logo e ícone", F.image("brand.logo", "Logo do site", { help: "Use PNG ou WebP com fundo transparente. Se ficar vazio, usa a logo padrão." }) + F.image("brand.favicon", "Ícone da aba do navegador", { help: "Imagem quadrada. Opcional." })) +
+  card("Textos do menu e dos botões", `<div class="row2">${F.text("menu.steps", "Menu: Como funciona")}${F.text("menu.gallery", "Menu: Galeria")}${F.text("menu.testimonials", "Menu: Avaliações")}${F.text("menu.faq", "Menu: FAQ")}${F.text("menu.cta", "Botão do topo")}${F.text("menu.fab", "Botão flutuante")}</div>`) +
+  card("Seções visíveis", F.check("sections.steps", "Como funciona") + F.check("sections.gallery", "Galeria") + F.check("sections.testimonials", "Depoimentos") + F.check("sections.faq", "Perguntas frequentes") + F.check("sections.cta", "Chamada final")) +
+  card("Google", F.text("site.seoTitle", "Título da página") + F.area("site.seoDescription", "Descrição", { rows: 3, help: "Texto que aparece nos resultados de busca e ao compartilhar o link." }));
+
+views.aparencia = () => H("Aparência", "Cores do site. As mudanças valem para botões, brilhos neon e fundos.") +
+  card("Cores", `<div class="colors">${F.color("theme.cyan", "Neon principal")}${F.color("theme.magenta", "Neon de destaque")}${F.color("theme.violet", "Roxo")}${F.color("theme.bg", "Fundo")}</div>` +
+    `<div class="pv" id="pv"></div><div><button class="btn sm ghost" type="button" data-act="reset-theme">Restaurar cores padrão</button></div>`);
+
+views.inicio = () => H("Início", "Primeira tela do site: chamada, botões e vídeo.") +
+  card("Textos", F.area("hero.title", "Título principal", { rows: 2 }) + F.area("hero.subtitle", "Subtítulo", { rows: 3 }) +
+    `<div class="row2">${F.text("hero.primary", "Botão principal (WhatsApp)")}${F.text("hero.secondary", "Botão secundário")}</div>` +
+    strlist("hero.proof", "Destaques abaixo dos botões", { add: "Adicionar destaque" })) +
+  card("Vídeo ou animação", F.select("hero.mode", "O que mostrar ao lado do título", [["animation", "Animação da impressora 3D (padrão)"], ["video", "Meu vídeo de um Funko real"]]) +
+    F.image("hero.videoUrl", "Vídeo (MP4 ou WebM, até " + MAX_MB + " MB)", { kind: "video", help: "Vídeo curto em loop, sem som. Se passar de " + MAX_MB + " MB, use o guia abaixo ou cole o link de um arquivo hospedado em outro lugar." }) +
+    F.image("hero.posterUrl", "Imagem de capa do vídeo", { help: "Aparece enquanto o vídeo carrega. Opcional." }) +
+    F.select("hero.videoRatio", "Formato do quadro do vídeo", [["4/5", "Vertical (4:5)"], ["1/1", "Quadrado (1:1)"], ["16/9", "Horizontal (16:9)"]]) +
+    `<details class="help"><summary>Como reduzir o peso do vídeo (limite: ${MAX_MB} MB)</summary><p>Use um vídeo de 6 a 10 segundos, sem áudio. Com o programa gratuito FFmpeg:</p><pre class="code">ffmpeg -i entrada.mp4 -t 8 -vf "scale=720:-2,fps=24" -an -c:v libx264 -crf 28 -preset slow -movflags +faststart saida.mp4</pre><p>Sem computador, o CapCut ou o InShot exportam em 720p com boa compressão. Se o arquivo continuar grande, aumente o número do <b>-crf</b> (por exemplo, 30) ou reduza a duração.</p></details>`);
+
+views.passos = () => H("Como funciona", "Etapas do processo, na ordem em que aparecem.") +
+  card("Título da seção", F.text("steps.title", "Título")) +
+  card("Etapas", stepsList());
+function stepsList() {
+  const a = data.steps.items, n = a.length;
+  return `<div class="toolbar"><button class="btn sm" type="button" data-act="add" data-kind="steps" ${n >= 6 ? "disabled" : ""}>＋ Nova etapa</button></div>` +
+    a.map((s, i) => `<details class="item" data-id="s${i}" ${openSet.has("s" + i) ? "open" : ""}><summary><span class="sum-th">${i + 1}</span><span class="sum-t">${esc(s.title)}</span></summary><div class="item-body">` +
+      F.text(`steps.items.${i}.title`, "Título", { sum: 1 }) + F.area(`steps.items.${i}.text`, "Descrição", { rows: 3 }) + itemTools("steps.items", i, n, { noDel: n <= 2 }) + `</div></details>`).join("") +
+    `<small>De 2 a 6 etapas. Os ícones seguem a ordem: foto, modelo 3D, pintura e entrega.</small>`;
+}
+
+views.galeria = () => {
+  const g = data.gallery, a = g.items, n = a.length;
+  return H("Galeria", "Projetos que aparecem no site. Envie as fotos dos Funkos reais.") +
+    card("Textos da seção", F.text("gallery.title", "Título") + F.text("gallery.subtitle", "Subtítulo") + F.text("gallery.moreLabel", "Texto do botão “ver mais”")) +
+    card("Categorias (filtros)", strlist("gallery.categories", "Categorias", { cat: 1, add: "Nova categoria", help: "Ao renomear uma categoria, os projetos dela são atualizados junto." })) +
+    card("Projetos", `<div class="toolbar"><button class="btn primary sm" type="button" data-act="add" data-kind="gallery">＋ Novo projeto</button></div>` +
+      a.map((w, i) => {
+        const imgs = w.images || [];
+        return `<details class="item" data-id="${w.id}" ${openSet.has(w.id) ? "open" : ""}><summary><span class="sum-th">${imgs[0] ? thumbOf(imgs[0]) : "sem foto"}</span>` +
+          `<span style="min-width:0"><span class="sum-t" style="display:block">${esc(w.title || "(sem título)")}</span><span class="sum-s">${esc(w.cat || "")}</span></span>${w.visible === false ? '<span class="pill">oculto</span>' : ""}</summary><div class="item-body">` +
+          imgsManager(`gallery.items.${i}.images`) +
+          F.text(`gallery.items.${i}.title`, "Título do projeto", { sum: 1 }) +
+          `<div class="row2">${F.select(`gallery.items.${i}.cat`, "Categoria", [["", "Sem categoria"]].concat(g.categories.map(c => [c, c])))}${F.color(`gallery.items.${i}.tone`, "Cor de destaque")}</div>` +
+          F.area(`gallery.items.${i}.desc`, "Descrição", { rows: 2 }) +
+          F.text(`gallery.items.${i}.base`, "Feito a partir de", { ph: "Ex.: uma foto do casal juntos" }) +
+          F.text(`gallery.items.${i}.detail`, "Detalhes do personagem", { ph: "Ex.: moletom roxo, óculos e controle" }) +
+          F.check(`gallery.items.${i}.visible`, "Mostrar no site") + itemTools("gallery.items", i, n) + `</div></details>`;
+      }).join("") + `<small>Projetos sem foto mostram uma ilustração de exemplo. Envie fotos reais para substituí-la.</small>`);
+};
+
+views.depoimentos = () => {
+  const T = data.testimonials, a = T.items, n = a.length;
+  return H("Depoimentos", "Foto original do cliente ao lado do Funko pronto.") +
+    card("Textos da seção", F.text("testimonials.title", "Título") + F.text("testimonials.subtitle", "Subtítulo") + `<div class="row2">${F.text("testimonials.labelOriginal", "Legenda da foto original")}${F.text("testimonials.labelResult", "Legenda do Funko")}</div>`) +
+    card("Depoimentos", `<div class="toolbar"><button class="btn primary sm" type="button" data-act="add" data-kind="testimonials">＋ Novo depoimento</button></div>` +
+      a.map((t, i) => `<details class="item" data-id="${t.id}" ${openSet.has(t.id) ? "open" : ""}><summary><span class="sum-th">${thumbOf(t.holding) || "sem foto"}</span>` +
+        `<span style="min-width:0"><span class="sum-t" style="display:block">${esc(t.name || "(sem nome)")}</span><span class="sum-s">${esc(t.city || "")}</span></span>${t.visible === false ? '<span class="pill">oculto</span>' : ""}</summary><div class="item-body">` +
+        `<div class="row2">${F.text(`testimonials.items.${i}.name`, "Nome", { sum: 1 })}${F.text(`testimonials.items.${i}.city`, "Cidade")}</div>` +
+        F.area(`testimonials.items.${i}.text`, "Depoimento", { rows: 3 }) +
+        F.image(`testimonials.items.${i}.original`, "Foto original enviada pelo cliente") +
+        F.image(`testimonials.items.${i}.holding`, "Cliente segurando o Funko (ou foto do Funko pronto)") +
+        F.check(`testimonials.items.${i}.visible`, "Mostrar no site") + itemTools("testimonials.items", i, n) + `</div></details>`).join("") +
+      `<small>Peça autorização do cliente antes de publicar as fotos e o depoimento.</small>`);
+};
+
+views.faq = () => {
+  const a = data.faq.items, n = a.length;
+  return H("Perguntas frequentes", "Perguntas e respostas mais comuns.") +
+    card("Título da seção", F.text("faq.title", "Título")) +
+    card("Perguntas", `<div class="toolbar"><button class="btn primary sm" type="button" data-act="add" data-kind="faq">＋ Nova pergunta</button></div>` +
+      a.map((f, i) => `<details class="item" data-id="f${i}" ${openSet.has("f" + i) ? "open" : ""}><summary><span class="sum-th">${i + 1}</span><span class="sum-t">${esc(f.q)}</span></summary><div class="item-body">` +
+        F.text(`faq.items.${i}.q`, "Pergunta", { sum: 1 }) + F.area(`faq.items.${i}.a`, "Resposta", { rows: 4 }) + itemTools("faq.items", i, n) + `</div></details>`).join(""));
+};
+
+views.rodape = () => H("Chamada final e rodapé", "Bloco final de contato e informações do rodapé.") +
+  card("Chamada final", F.area("cta.title", "Título", { rows: 2 }) + F.area("cta.text", "Texto", { rows: 2 }) + F.text("cta.button", "Texto do botão")) +
+  card("Rodapé", F.text("footer.tagline", "Frase da marca") + F.text("footer.copyright", "Direitos autorais", { help: "O ano e o símbolo © são adicionados automaticamente." }) + F.area("footer.disclaimer", "Aviso legal", { rows: 3 })) +
+  card("Termos e privacidade", F.area("footer.terms", "Termos de uso", { rows: 8, help: "Separe os parágrafos com uma linha em branco." }) + F.area("footer.privacy", "Política de privacidade", { rows: 6, help: "Revise estes textos com um profissional antes de publicar." }));
+
+views.midia = () => H("Biblioteca de mídia", "Todos os arquivos enviados para o site.") +
+  `<div class="toolbar"><button class="btn primary sm" type="button" data-act="lib-upload">＋ Enviar arquivos</button></div><div id="libPage"><p class="lead">Carregando…</p></div>`;
+
+views.sistema = () => H("Backup e sistema", "Guarde uma cópia do conteúdo ou volte ao padrão.") +
+  card("Backup", `<div class="toolbar"><button class="btn sm" type="button" data-act="export">Baixar backup (JSON)</button><button class="btn sm ghost" type="button" data-act="import">Carregar backup</button></div><small>O backup guarda textos, ordem e links das imagens. As imagens ficam na biblioteca de mídia.</small>`) +
+  card("Restaurar padrão", `<p>Apaga todas as edições publicadas e volta aos textos e ilustrações originais. As imagens da biblioteca não são apagadas.</p><div><button class="btn sm danger" type="button" data-act="reset-all">Restaurar site ao padrão</button></div>`) +
+  card("Senha do painel", `<p>A senha fica no arquivo <b>config.php</b>, na pasta principal do site (edite pelo Gerenciador de Arquivos da hospedagem). Ao trocá-la, todas as sessões abertas são encerradas.</p>`);
+
+function renderPanel() {
+  const st = scrollY;
+  $("#panel").innerHTML = views[activeTab]();
+  if (pendingOpen) { const d = $(`details[data-id="${pendingOpen}"]`); if (d) { d.open = true; d.scrollIntoView({ block: "center" }); } pendingOpen = null; }
+  else scrollTo(0, st);
+  if (activeTab === "aparencia") paintPv();
+  if (activeTab === "midia") loadLibPage();
+}
+function paintPv() {
+  const t = data.theme, p = $("#pv"); if (!p) return;
+  p.style.background = t.bg;
+  p.innerHTML = `<b style="background:linear-gradient(120deg,${t.cyan},${t.magenta})">Botão neon</b><b style="background:${t.violet};color:#fff">Roxo</b><span style="color:${t.cyan}">Texto em destaque</span>`;
+}
+
+/* ---------- Eventos de campos ---------- */
+const panel = $("#panel");
+panel.addEventListener("input", e => {
+  const el = e.target.closest("[data-bind]"); if (!el) return;
+  const v = el.type === "checkbox" ? el.checked : el.value;
+  setp(data, el.dataset.bind, v);
+  if (el.dataset.sum) { const s = el.closest("details.item"); const t = s && $(".sum-t", s); if (t) t.textContent = v || "(sem título)"; }
+  if (el.type === "color") { const h = $("[data-hex]", el.closest(".colorf")); if (h) h.textContent = v; if (activeTab === "aparencia") paintPv(); }
+  markDirty();
+});
+panel.addEventListener("change", e => {
+  const el = e.target.closest("[data-bind]"); if (!el) return;
+  if (el.dataset.cat) {
+    const old = el.dataset.old, nw = el.value.trim();
+    if (old !== undefined && old !== nw) { data.gallery.items.forEach(w => { if (w.cat === old) w.cat = nw; }); el.dataset.old = nw; markDirty(); }
+  }
+  if (el.dataset.reload || el.tagName === "SELECT" || el.type === "checkbox") { if (el.type === "checkbox" || el.dataset.reload || el.dataset.bind.startsWith("hero.")) renderPanel(); }
+});
+panel.addEventListener("toggle", e => { const d = e.target; if (d.matches && d.matches("details.item")) { d.open ? openSet.add(d.dataset.id) : openSet.delete(d.dataset.id); } }, true);
+
+/* ---------- Ações ---------- */
+const NEW = {
+  steps: () => ({ title: "Nova etapa", text: "Descreva esta etapa." }),
+  faq: () => ({ q: "Nova pergunta", a: "Escreva a resposta." }),
+  gallery: () => ({ id: uid(), title: "Novo projeto", cat: (data.gallery.categories[0] || ""), tone: "#8a5cff", desc: "", base: "", detail: "", images: [], visible: true }),
+  testimonials: () => ({ id: uid(), kind: "person", name: "Nome do cliente", city: "Cidade, UF", text: "", original: "", holding: "", visible: true, art: { tone: "#8a5cff" } })
+};
+const arr = p => getp(data, p);
+const swap = (a, i, j) => { const t = a[i]; a[i] = a[j]; a[j] = t; };
+
+panel.addEventListener("click", async e => {
+  const b = e.target.closest("[data-act]"); if (!b) return;
+  const act = b.dataset.act, p = b.dataset.path, i = +b.dataset.i;
+  try {
+    switch (act) {
+      case "add": {
+        const k = b.dataset.kind, it = NEW[k]();
+        const list = k === "steps" ? data.steps.items : k === "faq" ? data.faq.items : data[k].items;
+        if (k === "gallery" || k === "testimonials") list.unshift(it); else list.push(it);
+        pendingOpen = it.id || (k === "steps" ? "s" + (list.length - 1) : "f" + (list.length - 1));
+        if (it.id) openSet.add(it.id); markDirty(); renderPanel(); break;
+      }
+      case "add-str": arr(p).push(""); markDirty(); renderPanel(); break;
+      case "del": {
+        if (p === "steps.items" && arr(p).length <= 2) break;
+        if (!p.endsWith("proof") && !p.endsWith("categories") && !confirm("Excluir este item?")) break;
+        arr(p).splice(i, 1); openSet.clear(); markDirty(); renderPanel(); break;
+      }
+      case "up": if (i > 0) { swap(arr(p), i, i - 1); openSet.clear(); const it = arr(p)[i - 1]; if (it.id) { openSet.add(it.id); } markDirty(); renderPanel(); } break;
+      case "down": if (i < arr(p).length - 1) { swap(arr(p), i, i + 1); openSet.clear(); const it = arr(p)[i + 1]; if (it.id) { openSet.add(it.id); } markDirty(); renderPanel(); } break;
+      case "img-left": if (i > 0) { swap(arr(p), i, i - 1); markDirty(); renderPanel(); } break;
+      case "img-right": if (i < arr(p).length - 1) { swap(arr(p), i, i + 1); markDirty(); renderPanel(); } break;
+      case "img-del": arr(p).splice(i, 1); markDirty(); renderPanel(); break;
+      case "clear": setp(data, p, ""); markDirty(); renderPanel(); break;
+      case "upload": { const f = await pickFiles(b.dataset.kind === "video" ? "video/mp4,video/webm" : "image/*", false); if (f.length) { const u = await uploadFile(f[0], b.dataset.kind, p); setp(data, p, u); markDirty(); renderPanel(); toast("Arquivo enviado."); } break; }
+      case "imgs-upload": { const fs = await pickFiles("image/*", true); if (fs.length) { for (let n = 0; n < fs.length; n++) { const u = await uploadFile(fs[n], "image", p, `Enviando ${n + 1} de ${fs.length}…`); arr(p).push(u); } markDirty(); renderPanel(); toast(fs.length > 1 ? "Fotos enviadas." : "Foto enviada."); } break; }
+      case "library": openLibrary(b.dataset.kind, u => { setp(data, p, u); markDirty(); renderPanel(); }); break;
+      case "imgs-library": openLibrary("image", u => { arr(p).push(u); markDirty(); renderPanel(); }); break;
+      case "reset-theme": data.theme = clone(DEFAULTS.theme); markDirty(); renderPanel(); break;
+      case "lib-upload": await libUploadFlow(); break;
+      case "lib-del": await libDelete(b.dataset.file, b.dataset.url); break;
+      case "lib-copy": try { await navigator.clipboard.writeText(location.origin + b.dataset.url); toast("Link copiado."); } catch (er) { toast("Não foi possível copiar. Selecione o link manualmente: " + b.dataset.url, true); } break;
+      case "export": exportBackup(); break;
+      case "import": importBackup(); break;
+      case "reset-all": await resetAll(); break;
+    }
+  } catch (err) { toast(err.message, true); }
+});
+
+/* ---------- Upload ---------- */
+const fileIn = $("#fileIn");
+function pickFiles(accept, multiple) {
+  return new Promise(res => {
+    fileIn.value = ""; fileIn.accept = accept; fileIn.multiple = !!multiple;
+    fileIn.onchange = () => res(Array.from(fileIn.files || []));
+    fileIn.click();
+  });
+}
+async function compress(file, max, q = .86) {
+  let bmp;
+  try { bmp = await createImageBitmap(file, { imageOrientation: "from-image" }); } catch (e) { throw new Error("Não foi possível ler esta imagem. Use JPG, PNG ou WebP."); }
+  const s = Math.min(1, max / Math.max(bmp.width, bmp.height));
+  const w = Math.max(1, Math.round(bmp.width * s)), h = Math.max(1, Math.round(bmp.height * s));
+  const cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+  cv.getContext("2d").drawImage(bmp, 0, 0, w, h);
+  let blob = await new Promise(r => cv.toBlob(r, "image/webp", q));
+  if (!blob || blob.type !== "image/webp") blob = await new Promise(r => cv.toBlob(r, "image/jpeg", q));
+  return blob;
+}
+async function uploadFile(file, kind, path, msg) {
+  busy(true, msg || "Enviando…");
+  try {
+    let blob = file, name = file.name || "arquivo";
+    if (kind === "image") {
+      if (!file.type.startsWith("image/")) throw new Error("Escolha um arquivo de imagem.");
+      const max = path && path.startsWith("brand.") ? 900 : 1600;
+      blob = await compress(file, max);
+      name = name.replace(/\.\w+$/, "") + (blob.type === "image/webp" ? ".webp" : ".jpg");
+    } else if (!/^video\/(mp4|webm)$/.test(file.type)) throw new Error("Use um vídeo MP4 ou WebM.");
+    if (blob.size > MAX_BYTES) throw new Error(`O arquivo tem ${mb(blob.size)} e o limite é ${MAX_MB} MB.` + (kind === "video" ? " Reduza o vídeo (veja o guia na aba Início) ou cole o link de um arquivo hospedado em outro lugar." : " Use uma imagem menor."));
+    const j = await api(API + "media", { method: "POST", headers: { "content-type": blob.type, "x-filename": encodeURIComponent(name) }, body: blob });
+    return j.url;
+  } finally { busy(false); }
+}
+
+/* ---------- Biblioteca ---------- */
+let libCache = [];
+async function fetchLib() { const j = await api(API + "media"); libCache = j.items || []; return libCache; }
+function tile(m, pick) {
+  const isV = (m.type || "").startsWith("video/");
+  const media = isV ? `<video src="${esc(m.url)}#t=0.1" muted preload="metadata"></video>` : `<img src="${esc(m.url)}" alt="" loading="lazy">`;
+  return `<div class="tile"><${pick ? `button type="button" data-pick="${esc(m.url)}"` : 'div'} class="tile-m" ${pick ? 'aria-label="Escolher ' + esc(m.name) + '"' : ""}>${media}</${pick ? "button" : "div"}>` +
+    `<div class="tile-i"><span class="tile-n" title="${esc(m.name)}">${esc(m.name)}</span><span class="tile-s">${mb(m.size)}</span>` +
+    (pick ? "" : `<div class="tile-b"><button class="btn sm" type="button" data-act="lib-copy" data-url="${esc(m.url)}">Copiar link</button><button class="btn sm danger" type="button" data-act="lib-del" data-file="${esc(m.file)}" data-url="${esc(m.url)}" aria-label="Apagar">✕</button></div>`) + `</div></div>`;
+}
+async function loadLibPage() {
+  const box = $("#libPage"); if (!box) return;
+  try {
+    const items = await fetchLib();
+    box.innerHTML = items.length ? `<div class="lib">${items.map(m => tile(m, false)).join("")}</div>` : '<p class="lead">Nenhum arquivo enviado ainda.</p>';
+  } catch (e) { box.innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+}
+async function libUploadFlow() {
+  const fs = await pickFiles("image/*,video/mp4,video/webm", true);
+  for (let n = 0; n < fs.length; n++) await uploadFile(fs[n], fs[n].type.startsWith("video/") ? "video" : "image", "", `Enviando ${n + 1} de ${fs.length}…`);
+  if (fs.length) { toast("Arquivos enviados."); if (activeTab === "midia") loadLibPage(); }
+}
+async function libDelete(file, url) {
+  const used = JSON.stringify(data).includes(url);
+  if (!confirm((used ? "Este arquivo está em uso no site. Se apagar, ele vai sumir do site. " : "") + "Apagar este arquivo da biblioteca?")) return;
+  busy(true, "Apagando…");
+  try { await api(API + "media/" + encodeURIComponent(file) + "&delete=1", { method: "POST" }); toast("Arquivo apagado."); await loadLibPage(); } finally { busy(false); }
+}
+let libPick = null;
+async function openLibrary(kind, onPick) {
+  libPick = { kind, onPick };
+  $("#libModal").hidden = false; $("#libBody").innerHTML = '<p class="lead">Carregando…</p>';
+  try {
+    const items = (await fetchLib()).filter(m => kind === "video" ? (m.type || "").startsWith("video/") : (m.type || "").startsWith("image/"));
+    $("#libBody").innerHTML = items.length ? `<div class="lib">${items.map(m => tile(m, true)).join("")}</div>` : '<p class="lead">Nenhum arquivo deste tipo na biblioteca. Use “Enviar novo arquivo”.</p>';
+  } catch (e) { $("#libBody").innerHTML = `<p class="err">${esc(e.message)}</p>`; }
+}
+function closeLib() { $("#libModal").hidden = true; libPick = null; }
+$("#libClose").addEventListener("click", closeLib);
+$("#libModal").addEventListener("click", e => { if (e.target.id === "libModal") closeLib(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#libModal").hidden) closeLib(); });
+$("#libBody").addEventListener("click", e => { const b = e.target.closest("[data-pick]"); if (!b || !libPick) return; const cb = libPick.onPick; closeLib(); cb(b.dataset.pick); });
+$("#libUpload").addEventListener("click", async () => {
+  if (!libPick) return; const { kind, onPick } = libPick;
+  try {
+    const fs = await pickFiles(kind === "video" ? "video/mp4,video/webm" : "image/*", false);
+    if (fs.length) { const u = await uploadFile(fs[0], kind, "", "Enviando…"); closeLib(); onPick(u); toast("Arquivo enviado."); }
+  } catch (err) { toast(err.message, true); }
+});
+
+/* ---------- Backup, restauração, publicar ---------- */
+function exportBackup() {
+  const blob = new Blob([JSON.stringify(data, null, 1)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = "axon3d-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+async function importBackup() {
+  const f = (await pickFiles("application/json,.json", false))[0]; if (!f) return;
+  try {
+    const obj = JSON.parse(await f.text());
+    if (!obj || typeof obj !== "object" || Array.isArray(obj) || !obj.gallery) throw new Error("Este arquivo não parece um backup do site.");
+    data = merge(clone(DEFAULTS), obj); markDirty(); renderPanel(); toast("Backup carregado. Clique em Publicar para aplicar.");
+  } catch (e) { toast(e.message || "Arquivo inválido.", true); }
+}
+async function resetAll() {
+  if (!confirm("Voltar o site ao padrão? Todas as edições publicadas serão apagadas.")) return;
+  busy(true, "Restaurando…");
+  try { await api(API + "content&reset=1", { method: "POST" }); data = clone(DEFAULTS); dirty = false; lsSet(DRAFT_KEY, null); updateStatus(); renderPanel(); toast("Site restaurado ao padrão."); } finally { busy(false); }
+}
+async function publish() {
+  const digits = String(data.site.whatsapp || "").replace(/\D/g, "");
+  if (!/^\d{12,13}$/.test(digits) && !confirm("O número de WhatsApp parece incompleto (esperado: 55 + DDD + número). Publicar mesmo assim?")) return;
+  data.site.whatsapp = digits;
+  if (data.hero.mode === "video" && !data.hero.videoUrl && !confirm("Você escolheu mostrar um vídeo, mas nenhum vídeo foi enviado. O site vai mostrar a animação. Continuar?")) return;
+  busy(true, "Publicando…");
+  try {
+    await api(API + "content", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(data) });
+    dirty = false; lsSet(DRAFT_KEY, null); updateStatus(); toast("Publicado! O site já está atualizado.");
+    if (activeTab === "geral") renderPanel();
+  } catch (e) { toast(e.message, true); } finally { busy(false); }
+}
+$("#publishBtn").addEventListener("click", publish);
+$("#previewBtn").addEventListener("click", () => { lsSet(DRAFT_KEY, JSON.stringify(data)); window.open("/?preview=1", "_blank"); });
+
+/* ---------- Sessão salva ---------- */
+(async () => {
+  if (!token()) return;
+  try { await api(API + "session"); await start(); } catch (e) { /* volta ao login */ }
+})();
+})();
+</script>
+</body>
+</html>
